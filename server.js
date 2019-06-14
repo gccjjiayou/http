@@ -10,12 +10,25 @@ var server = http.createServer(function (req, res) {
     })
     res.end(html)
   }
-  if(req.url === '/script.js') {
-    res.writeHead(200, {
-      'Content-Type': 'text/javascript',
-      'Cache-Control': 'max-age=200'
-    })
-    res.end('console.log("script loaded third")')
+  if (req.url === '/script.js') {
+    const ifNoneMatch = req.headers['if-none-match']
+    if (ifNoneMatch === 'signature') {
+      res.writeHead(304, {
+        'Content-Type': 'text/javascript',
+        'Cache-Control': 'max-age=2',
+        'Last-Modified': '123',
+        'Etag': 'signature'
+      })
+      res.end('123')
+    } else {
+      res.writeHead(200, {
+        'Content-Type': 'text/javascript',
+        'Cache-Cotrol': 'max-age=2',
+        'Last-Modified': '123',
+        'Etag': 'signature'
+      })
+      res.end('console.log("script loaded")')
+    }
   }
 })
 server.listen(8080)
